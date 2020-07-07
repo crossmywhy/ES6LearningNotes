@@ -45,5 +45,52 @@ let x = x;
 
 ### let不允许在相同作用域内，重复声明同一个变量。
 
+## 2. 块级作用域
+```javascript
+// 块级作用域内部的函数声明语句，建议不要使用
+{
+  let a = 'secret';
+  function f() {
+    return a;
+  }
+}
 
- 
+// 块级作用域内部，优先使用函数表达式
+{
+  let a = 'secret';
+  let f = function () {
+    return a;
+  };
+}
+
+// 第一种写法，报错。ES6 的块级作用域必须有大括号，如果没有大括号，JavaScript 引擎就认为不存在块级作用域。
+if (true) let x = 1;
+
+// 第二种写法，不报错
+if (true) {
+  let x = 1;
+}
+```
+
+ ## 3. const 命令
+ const一旦声明变量，就必须立即初始化(只声明不赋值，就会报错)。
+ const的作用域与let命令相同：只在声明所在的块级作用域内有效。
+ const实际上保证的是变量指向的那个内存地址所保存的数据不得改动。
+ ```javascript
+ const foo = {};
+
+// 为 foo 添加一个属性，可以成功
+foo.prop = 123;
+foo.prop // 123
+
+// 将 foo 指向另一个对象，就会报错
+foo = {}; // TypeError: "foo" is read-only
+```
+```javascript
+const a = [];
+a.push('Hello'); // 可执行
+a.length = 0;    // 可执行
+a = ['Dave'];    // 报错
+ ```
+用`Object.freeze`方法将对象冻结。
+
