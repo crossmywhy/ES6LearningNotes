@@ -256,3 +256,84 @@ for (let [key, value] of map) {
 ```javascript
 const { SourceMapConsumer, SourceNode } = require("source-map");
 ```
+
+# 四、字符串的扩展
+## 字符的 Unicode 表示法
+```javascript
+"\u0061"        // "a"
+"\uD842\uDFB7"  // "𠮷"。
+```
+这种表示法只限于码点在`\u0000`~`\uFFFF`之间的字符。超出这个范围的字符，必须用两个双字节的形式表示。
+```javascript
+"\u{20BB7}"     // "𠮷"
+"\u{41}\u{42}\u{43}"    // "ABC"
+
+let hello = 123;
+hell\u{6F} // 123
+```
+```javascript
+'\z' === 'z'        // true
+'\172' === 'z'      // true
+'\x7A' === 'z'      // true
+'\u007A' === 'z'    // true
+'\u{7A}' === 'z'    // true
+```
+## 用`for...of`遍历字符串
+```javascript
+let text = String.fromCodePoint(0x20BB7);
+for (let i = 0; i < text.length; i++) {
+  console.log(text[i]);
+}
+// " "
+// " "
+```
+传统的for循环无法识别大于`0xFFFF`的码点。
+```javascript
+for (let i of text) {
+  console.log(i);
+}
+// "𠮷"
+```
+## 模板字符串
+```javascript
+// 字符串中嵌入变量
+let name = "Bob", time = "today";
+`Hello ${name}, how are you ${time}?`
+// "Hello Bob, how are you today?"
+
+let greeting = `\`Yo\` World!`;
+// "`Yo` World!"
+
+let obj = {x: 1, y: 2};
+`${obj.x + obj.y}`
+// "3"
+```
+### 嵌套
+```javascript
+const tmpl = addrs => `
+  <table>
+  ${addrs.map(addr => `
+    <tr><td>${addr.first}</td></tr>
+    <tr><td>${addr.last}</td></tr>
+  `).join('')}
+  </table>
+`;
+
+// 使用方法：
+const data = [
+    { first: '<Jane>', last: 'Bond' },
+    { first: 'Lars', last: '<Croft>' },
+];
+
+console.log(tmpl(data));
+// <table>
+//
+//   <tr><td><Jane></td></tr>
+//   <tr><td>Bond</td></tr>
+//
+//   <tr><td>Lars</td></tr>
+//   <tr><td><Croft></td></tr>
+//
+// </table>
+```
+
