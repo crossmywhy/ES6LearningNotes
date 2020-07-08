@@ -337,3 +337,87 @@ console.log(tmpl(data));
 // </table>
 ```
 
+# 五、字符串的新增方法
+## String.raw()
+`String.raw()`方法可以作为处理模板字符串的基本方法，它会将所有变量替换，而且对斜杠进行转义，方便下一步作为字符串来使用。
+```javascript
+`Hi\u000A!`;
+// "Hi
+// !"
+
+String.raw`Hi\u000A!`;
+// 实际返回 "Hi\\u000A!"，显示的是转义后的结果 "Hi\u000A!"
+
+String.raw`Hi\\n`
+// 返回 "Hi\\\\n"，显示"Hi\\n"
+
+String.raw`Hi\\n` === "Hi\\\\n" // true
+```
+
+## codePointAt()
+汉字“𠮷”，码点为`0x20BB7`，UTF-16 编码为`0xD842` `0xDFB7`（十进制为`55362` `57271`）
+```javascript
+var s = "𠮷a";
+s.length // 3
+s.charCodeAt(0) // 55362
+s.charCodeAt(1) // 57271
+
+s.codePointAt(0) // 134071
+s.codePointAt(0).toString(16) // "20bb7"
+s.codePointAt(1) // 57271
+s.codePointAt(2).toString(16) // "61"
+```
+为正确获取字符串中的正确位置，用`for...of`结构：
+```javascript
+let s = '𠮷a';
+for (let ch of s) {
+  console.log(ch.codePointAt(0).toString(16));
+}
+// 20bb7
+// 61
+```
+
+## includes(), startsWith(), endsWith()
+```javascript
+let s = 'Hello world!';
+
+s.startsWith('Hello') // true
+s.startsWith('world', 6) // true
+s.endsWith('Hello', 5) // true
+s.includes('Hello', 6) // false
+```
+
+## repeat()
+```javascript
+'hello'.repeat(2) // "hellohello"
+'na'.repeat(2.9) // "nana"。小数取整
+'na'.repeat('3') // "nanana"。参数优先转换成数字
+```
+
+## padStart()，padEnd()
+```javascript
+'x'.padStart(5, 'ab') // 'ababx'
+'x'.padStart(4, 'ab') // 'abax'
+
+'x'.padEnd(5, 'ab') // 'xabab'
+'x'.padEnd(4, 'ab') // 'xaba'
+
+'xxx'.padStart(2, 'ab') // 'xxx'
+
+'abc'.padStart(10, '0123456789')  // '0123456abc'
+
+'x'.padStart(4) // '   x'
+'x'.padEnd(4) // 'x   '
+
+'12'.padStart(10, 'YYYY-MM-DD') // "YYYY-MM-12"
+'09-12'.padStart(10, 'YYYY-MM-DD') // "YYYY-09-12"
+```
+
+## trimStart()，trimEnd()
+```javascript
+const s = '  abc  ';
+
+s.trim() // "abc"
+s.trimStart() // "abc  "
+s.trimEnd() // "  abc"
+```
