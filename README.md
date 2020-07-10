@@ -447,3 +447,219 @@ s.trimEnd() // "  abc"
 * `/\w/`：匹配一个非单字字符（字母、数字或者下划线），等价于 `/[A-Za-z0-9_]/`；
 ** e.g. 匹配"$5.28,"中的 '5'。
 
+# 十六、Promise对象
+```javascript
+const promise = new Promise(function(resolve, reject) {
+  // ... some code
+  if (/* 异步操作成功 */){
+    resolve(value);
+  } else {
+    reject(error);
+  }
+});
+
+promise.then(function(value) {
+  // success
+}, function(error) {
+  // failure
+});
+```
+e.g.
+```javascript
+let promise = new Promise(function(resolve, reject) {
+  console.log('Promise');
+  resolve();
+});
+
+promise.then(function() {
+  console.log('resolved.');
+});
+
+console.log('Hi!');
+
+// 输出顺序：
+// Promise
+// Hi!
+// resolved
+```
+首先输出的是Promise。然后，then方法指定的回调函数，将在当前脚本所有同步任务执行完才会执行，所以resolved最后输出。
+
+```javascript
+getJSON("/post/1.json").then(function(post) {
+  return getJSON(post.commentURL);
+}).then(function (comments) {
+  console.log("resolved: ", comments);
+}, function (err){
+  console.log("rejected: ", err);
+});
+// 用箭头函数可缩写为：
+getJSON("/post/1.json").then(
+  post => getJSON(post.commentURL)
+).then(
+  comments => console.log("resolved: ", comments),
+  err => console.log("rejected: ", err)
+);
+```
+### Promise.prototype.catch()
+```javascript
+getJSON('/post/1.json').then(function(post) {
+  return getJSON(post.commentURL);
+}).then(function(comments) {
+  // some code
+}).catch(function(error) {
+  // 处理前面三个Promise产生的错误
+});
+```
+一般来说，不要在then()方法里面定义 Reject 状态的回调函数（即then的第二个参数），总是使用catch方法。
+
+如果不用catch()方法指定错误处理的回调函数，Promise 对象抛出的错误不会传递到外层代码，即不会有任何反应：
+```javascript
+const someAsyncThing = function() {
+  return new Promise(function(resolve, reject) {
+    // 下面一行会报错，因为x没有声明
+    resolve(x + 2);
+  });
+};
+
+someAsyncThing().then(function() {
+  console.log('everything is great');
+});
+
+setTimeout(() => { console.log(123) }, 2000);
+// Uncaught (in promise) ReferenceError: x is not defined
+// 123
+```
+
+### Promise.prototype.finally()
+`finally()`方法用于指定不管 Promise 对象最后状态如何，都会执行的操作。
+
+### Promise.all()
+`Promise.all()`方法用于将多个 Promise 实例，包装成一个新的 Promise 实例。
+```javascript
+const p = Promise.all([p1, p2, p3]);
+```
+### p的状态由p1、p2、p3决定，分成两种情况：
+* （1）只有p1、p2、p3的状态都变成fulfilled，p的状态才会变成fulfilled，此时p1、p2、p3的返回值组成一个数组，传递给p的回调函数。
+* （2）只要p1、p2、p3之中有一个被rejected，p的状态就变成rejected，此时第一个被reject的实例的返回值，会传递给p的回调函数。
+  
+注意，如果作为参数的 Promise 实例，自己定义了catch方法，那么它一旦被rejected，**并不会**触发Promise.all()的catch方法。
+```javascript
+const p1 = new Promise((resolve, reject) => {
+  resolve('hello');
+})
+.then(result => result)
+.catch(e => e);
+
+const p2 = new Promise((resolve, reject) => {
+  throw new Error('报错了');
+})
+.then(result => result)
+.catch(e => e);   // 这里p2拥有catch方法。如果没有，就会由Promise的catch捕获错误。
+
+Promise.all([p1, p2])
+.then(result => console.log(result))
+.catch(e => console.log(e));
+// ["hello", Error: 报错了]
+```
+
+### Promise.race()
+只要p1、p2、p3之中有一个实例率先改变状态，p的状态就跟着改变。那个率先改变的 Promise 实例的返回值，就传递给p的回调函数。(用法与Promise.all()类似)
+
+### Promise.any()
+只要参数实例有一个变成fulfilled状态，包装实例就会变成fulfilled状态；如果所有参数实例都变成rejected状态，包装实例就会变成rejected状态。
+
+### Promise.allSettled()
+Promise.allSettled()方法接受一组 Promise 实例作为参数，包装成一个新的 Promise 实例。只有等到所有这些参数实例都返回结果，不管是fulfilled还是rejected，包装实例才会结束。
+
+```javascript
+const resolved = Promise.resolve(42);
+const rejected = Promise.reject(-1);
+
+const allSettledPromise = Promise.allSettled([resolved, rejected]);
+
+allSettledPromise.then(function (results) {
+  console.log(results);
+});
+// [
+//    { status: 'fulfilled', value: 42 },
+//    { status: 'rejected', reason: -1 }
+// ]
+```
+(Promise.allSettled()的返回值allSettledPromise，状态只可能变成fulfilled)
+
+e.g.
+```javascript
+const promises = [ fetch('index.html'), fetch('https://does-not-exist/') ];
+const results = await Promise.allSettled(promises);
+
+// 过滤出成功的请求
+const successfulPromises = results.filter(p => p.status === 'fulfilled');
+
+// 过滤出失败的请求，并输出原因
+const errors = results
+  .filter(p => p.status === 'rejected')
+  .map(p => p.reason);
+```
+```javascript
+
+const urls = [ /* ... */ ];
+const requests = urls.map(x => fetch(x));
+
+try {
+  await Promise.all(requests);
+  console.log('所有请求都成功。');
+} catch {
+  console.log('至少一个请求失败，其他请求可能还没结束。');
+}
+```
+
+### Promise.resolve() 
+将现有对象转为 Promise 对象。  
+其参数设置有四种情况：
+* 参数是一个 Promise 实例：Promise.resolve将不做任何修改、原封不动地返回这个实例。
+
+* 参数是一个`thenable`对象：
+```javascript
+let thenable = {
+  then: function(resolve, reject) {
+    resolve(42);
+  }
+};
+
+let p1 = Promise.resolve(thenable);
+p1.then(function(value) {
+  console.log(value);  // 42
+});
+```
+
+* 参数不是具有then方法的对象，或根本就不是对象：
+```javascript
+const p = Promise.resolve('Hello');
+
+p.then(function (s){
+  console.log(s)
+});
+// Hello
+```
+
+* 不带有任何参数：直接返回一个resolved状态的 Promise 对象。
+e.g. 注意以下运行时序：
+```javascript
+setTimeout(function () {
+  console.log('three');
+}, 0);
+
+Promise.resolve().then(function () {
+  console.log('two');
+});
+
+console.log('one');
+
+// one
+// two
+// three
+```
+上面代码中，setTimeout(fn, 0)在下一轮“事件循环”开始时执行，Promise.resolve()在本轮“事件循环”结束时执行，console.log('one')则是立即执行，因此最先输出。
+
+### Promise.reject()
+返回一个新的 Promise 实例，该实例的状态为rejected。
