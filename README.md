@@ -1,7 +1,7 @@
 # ES6LearningNotes https://es6.ruanyifeng.com/
 
 # 目录
-[二、let 和 const 命令](#二let 和 const 命令)  
+[二、let 和 const 命令](#二let-和-const-命令)  
 [三、变量的解构赋值](#三变量的解构赋值)  
 [四、字符串的扩展](#四字符串的扩展)  
 [五、字符串的新增方法](#五字符串的新增方法)  
