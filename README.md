@@ -1,5 +1,8 @@
 # ES6LearningNotes https://es6.ruanyifeng.com/
 
+# 目录
+## [二、let 和 const 命令](https://github.com/crossmywhy/ES6LearningNotes#%E4%BA%8Clet-%E5%92%8C-const-%E5%91%BD%E4%BB%A4)
+
 # 二、let 和 const 命令
 ## 1. let命令
 ### let(局部变量)； var(全局变量)
