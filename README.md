@@ -1,7 +1,14 @@
 # ES6LearningNotes https://es6.ruanyifeng.com/
 
 # 目录
-## [二、let 和 const 命令](https://github.com/crossmywhy/ES6LearningNotes#%E4%BA%8Clet-%E5%92%8C-const-%E5%91%BD%E4%BB%A4)
+### [二、let 和 const 命令](https://github.com/crossmywhy/ES6LearningNotes#%E4%BA%8Clet-%E5%92%8C-const-%E5%91%BD%E4%BB%A4)
+### [三、变量的解构赋值](https://github.com/crossmywhy/ES6LearningNotes#%E4%B8%89%E5%8F%98%E9%87%8F%E7%9A%84%E8%A7%A3%E6%9E%84%E8%B5%8B%E5%80%BC)
+### [四、字符串的扩展](https://github.com/crossmywhy/ES6LearningNotes#%E5%9B%9B%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E6%89%A9%E5%B1%95)
+### [五、字符串的新增方法](https://github.com/crossmywhy/ES6LearningNotes#%E4%BA%94%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E6%96%B0%E5%A2%9E%E6%96%B9%E6%B3%95)
+### [六、正则的扩展](https://github.com/crossmywhy/ES6LearningNotes#%E5%85%AD%E6%AD%A3%E5%88%99%E7%9A%84%E6%89%A9%E5%B1%95)
+### [十六、Promise对象](https://github.com/crossmywhy/ES6LearningNotes#%E5%8D%81%E5%85%ADpromise%E5%AF%B9%E8%B1%A1)
+
+
 
 # 二、let 和 const 命令
 ## 1. let命令
