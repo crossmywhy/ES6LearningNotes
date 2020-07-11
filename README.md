@@ -1,4 +1,4 @@
-# ES6LearningNotes https://es6.ruanyifeng.com/
+# ES6 LearningNotes https://es6.ruanyifeng.com/
 
 # 目录
 [二、let 和 const 命令](#二let-和-const-命令)  
@@ -7,6 +7,7 @@
 [五、字符串的新增方法](#五字符串的新增方法)  
 [六、正则的扩展](#六正则的扩展)  
 [十六、Promise对象](#十六Promise对象)  
+[二十三、Module的语法](#二十三Module的语法)  
 
 
 
@@ -673,3 +674,107 @@ console.log('one');
 
 ### Promise.reject()
 返回一个新的 Promise 实例，该实例的状态为rejected。
+
+
+# 二十三、Module的语法
+### export命令
+模块功能：`export`命令用于规定模块的对外接口，`import`命令用于输入其他模块提供的功能。
+```javascript
+// profile.js
+export var firstName = 'Michael';
+var firstName = 'Michael';
+var lastName = 'Jackson';
+var year = 1958;
+export { firstName, lastName, year };
+
+function v1() { ... }
+function v2() { ... }
+export {
+  v1 as streamV1,
+  v2 as streamV2,
+  v2 as streamLatestVersion
+};
+```
+大括号指定所要输出的一组变量，`as`关键字重命名。  
+  
+export语句输出的接口，与其对应的值是动态绑定关系，即通过该接口，可以取到模块内部实时的值：
+```javascript
+export var foo = 'bar';
+setTimeout(() => foo = 'baz', 500);
+```
+export命令不能处于块级作用域内，否则会报错。
+
+### import命令
+```javascript
+// main.js
+import { firstName, lastName, year } from './profile.js';
+import { lastName as surname } from './profile.js';
+```
+import命令输入的变量不能修改、重新赋值，但可以改写变量属性：
+```javascript
+// main.js
+import {a} from './xxx.js'
+a = {};           // Syntax Error : 'a' is read-only;
+a.foo = 'hello';  // 合法操作
+```
+! 但不建议这么改！！！
+  
+import是静态执行，所以不能使用表达式和变量。
+
+### 模块的继承
+假设有一个circleplus模块，继承了circle模块。
+```javascript
+// circleplus.js
+export { area as circleArea } from 'circle';
+```
+
+### 跨模块常量
+之前说`const`声明的常量只在当前代码块有效，但实际上可通过模块共享。如常量较多，可以建专门的`constants`目录，将各种常量写在不同的文件里面，保存在该目录下：
+```javascript
+// constants/db.js
+export const db = {
+  url: 'http://my.couchdbserver.local:5984',
+  admin_username: 'admin',
+  admin_password: 'admin password'
+};
+
+// constants/user.js
+export const users = ['root', 'admin', 'staff', 'ceo', 'chief', 'moderator'];
+
+// constants/index.js
+export {db} from './db';
+export {users} from './users';
+
+// 使用时直接加载index.js
+// script.js
+import {db, users} from './constants/index';
+```
+
+### import()
+`import`命令会被 JavaScript 引擎静态分析。ES2020提案 引入`import()`函数，支持动态加载模块。  
+在需要的时候，再加载某个模块
+```javascript
+button.addEventListener('click', event => {
+  import('./dialogBox.js')
+  .then(dialogBox => {
+    dialogBox.open();
+  })
+  .catch(error => {
+    /* Error handling */
+  })
+});
+  ```
+`import()`也可以用在 async 函数之中、同时加载多个模块。
+```javascript
+async function main() {
+  const myModule = await import('./myModule.js');
+  const {export1, export2} = await import('./myModule.js');
+  const [module1, module2, module3] =
+    await Promise.all([
+      import('./module1.js'),
+      import('./module2.js'),
+      import('./module3.js'),
+    ]);
+}
+main();
+```
