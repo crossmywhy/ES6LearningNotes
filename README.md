@@ -8,6 +8,9 @@
 [六、正则的扩展](#六正则的扩展)  
 [十六、Promise对象](#十六Promise对象)  
 [二十三、Module的语法](#二十三Module的语法)  
+[杂学](#杂学)  
+[二十五、编程风格](#二十五编程风格)  
+[二十六、读懂ECMAScript规格](#二十六读懂ECMAScript规格)  
 
 
 
@@ -778,3 +781,50 @@ async function main() {
 }
 main();
 ```
+
+
+
+
+# 杂学
+## Basic Reducer Structure and State Shape
+https://redux.js.org/recipes/structuring-reducers/basic-reducer-structure
+
+### state
+state是个plain Javascript object。存储方式决定应用核心。一般都将数据储存在“top-level key”：
+```javascript
+{
+  visibilityFilter: 'SHOW_ALL',
+  todos: [
+    {
+      text: 'Consider using Redux',
+      completed: true,
+    },
+    {
+      text: 'Keep all state in a single tree',
+      completed: false
+    }
+  ]
+}
+```
+
+
+# 二十五、编程风格
+* 建议不再使用var命令，而是用let命令。
+* 能用就多使用const，有利于提高程序的运行效率。
+* 静态字符串一律使用单引号或反引号，不使用双引号。动态字符串使用反引号。
+```javascript
+const a = 'foobar';
+const b = `foo${a}bar`;
+```
+* 对象尽量静态化，一旦定义，就不得随意添加新的属性。如果添加属性不可避免，要使用Object.assign方法。
+```javascript
+const a = { x: null };
+a.x = 3;
+```
+* 用扩展运算符（...）拷贝数组。
+```javascript
+const itemsCopy = [...items];
+```
+
+# 二十六、读懂ECMAScript规格
+规格是解决问题的“最后一招”，遇到疑难的语法问题，实在找不到答案，这时可以去查看规格文件。
